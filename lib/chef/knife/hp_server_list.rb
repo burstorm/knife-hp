@@ -38,7 +38,8 @@ class Chef
           ui.color('Image', :bold),
           ui.color('Zone', :bold),
           ui.color('Key Pair', :bold),
-          ui.color('State', :bold)
+          ui.color('State', :bold),
+          ui.color('IPv4', :bold)
         ]
         connection.list_servers_detail.body['servers'].sort_by { |h| h['name'] }.each do |server|
           Chef::Log.debug("Server: #{server.to_yaml}")
@@ -60,8 +61,17 @@ class Chef
                              ui.color(state, :green)
                            end
                          end
+          addr = nil
+          server['addresses'].each do |addrs|
+            addrs[1].each do |aline|              
+              next if aline['addr'].start_with? "10."
+              addr = aline['addr']
+              break
+            end
+          end
+          server_list << addr || ''
         end
-        puts ui.list(server_list, :uneven_columns_across, 7)
+        puts ui.list(server_list, :uneven_columns_across, 8)
 
       end
     end
